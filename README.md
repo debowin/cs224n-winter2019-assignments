@@ -5,16 +5,16 @@ Read the handout PDFs in each assignment folder for instructions and details.
 
 ### Results Showcase
 
-#### Assignment 1
+#### Assignment 1 (Word Vector Visualization & Interpretation)
 
 Please see the [Notebook](a1/exploring_word_vectors.ipynb).
 
-#### Assignment 2
-
+#### Assignment 2 (Word2Vec)
 Plot of Word Vector Space.
+
 ![Plot](a2/word_vectors.png)
 
-#### Assignment 3
+#### Assignment 3 (Dependency Parsing)
 
 * DEBUG = True [Output Log](a3/debug_true_output.txt).
   * Best Avg Train Loss - 0.116
