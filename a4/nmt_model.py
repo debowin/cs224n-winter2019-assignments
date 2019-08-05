@@ -82,7 +82,7 @@ class NMT(nn.Module):
         self.combined_output_projection = nn.Linear(hidden_size*3, hidden_size, bias=False)
         self.target_vocab_projection = nn.Linear(hidden_size, len(vocab.tgt), bias=False)
 
-        self.dropout = nn.Dropout(p=dropout_rate)
+        self.dropout = nn.Dropout(p=self.dropout_rate)
 
         ### END YOUR CODE
 
@@ -174,9 +174,9 @@ class NMT(nn.Module):
         ###         https://pytorch.org/docs/stable/tensors.html#torch.Tensor.permute
         X = self.model_embeddings.source(source_padded)
         enc_hiddens, (last_hidden, last_cell) = self.encoder(pack_padded_sequence(X, source_lengths))
-        enc_hiddens = pad_packed_sequence(enc_hiddens, batch_first=True)[0]
-        init_decoder_hidden = self.h_projection(torch.cat((last_hidden[0, :, :], last_hidden[1, :, :]), 1))
-        init_decoder_cell = self.c_projection(torch.cat((last_cell[0, :, :], last_cell[1, :, :]), 1))
+        enc_hiddens, _ = pad_packed_sequence(enc_hiddens, batch_first=True)
+        init_decoder_hidden = self.h_projection(torch.cat((last_hidden[0], last_hidden[1]), 1))
+        init_decoder_cell = self.c_projection(torch.cat((last_cell[0], last_cell[1]), 1))
         dec_init_state = (init_decoder_hidden, init_decoder_cell)
         ### END YOUR CODE
 
@@ -249,10 +249,10 @@ class NMT(nn.Module):
 
         enc_hiddens_proj = self.att_projection(enc_hiddens)
         Y = self.model_embeddings.target(target_padded)
-        for Y_t in torch.split(Y, 1, 0):
+        for Y_t in torch.split(Y, 1, dim=0):
             Y_t = torch.squeeze(Y_t, dim=0)
-            Ybar_t = torch.cat((Y_t, o_prev), 1)
-            (decoder_cell, decoder_state), o_t, _ = self.step(Ybar_t, dec_state, enc_hiddens, enc_hiddens_proj, enc_masks)
+            Ybar_t = torch.cat((Y_t, o_prev), dim=1)
+            dec_state, o_t, _ = self.step(Ybar_t, dec_state, enc_hiddens, enc_hiddens_proj, enc_masks)
             combined_outputs.append(o_t)
             o_prev = o_t
         combined_outputs = torch.stack(combined_outputs, dim=0)
@@ -349,10 +349,10 @@ class NMT(nn.Module):
         ###         https://pytorch.org/docs/stable/torch.html#torch.cat
         ###     Tanh:
         ###         https://pytorch.org/docs/stable/torch.html#torch.tanh
-        alpha_t = F.softmax(e_t, 0)
+        alpha_t = F.softmax(e_t, dim=1)
         a_t = torch.bmm(torch.unsqueeze(alpha_t, dim=1), enc_hiddens)
         a_t = torch.squeeze(a_t, dim=1)
-        U_t = torch.cat((dec_hidden, a_t), dim=1)
+        U_t = torch.cat((a_t, dec_hidden), dim=1)
         V_t = self.combined_output_projection(U_t)
         O_t = self.dropout(torch.tanh(V_t))
 
@@ -499,3 +499,4 @@ class NMT(nn.Module):
         }
 
         torch.save(params, path)
+

@@ -25,6 +25,18 @@ Plot of Word Vector Space.
   * Best Dev UAS - 88.78
   * Best Test UAS - 88.91
 
-#### Assignment 4 and 5
+#### Assignment 4 (Neural Machine Translation)
 
+Click [here](a4/outputs/test_output.txt) to see the Test Output.
+
+Console Output:
+(local_nmt) $ sh run.sh test
+load test source sentences from [./en_es_data/test.es]
+load test target sentences from [./en_es_data/test.en]
+load model from /media/storage2/nmt/model.bin
+Decoding: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 8064/8064 [04:20<00:00, 30.90it/s]
+Corpus BLEU: 22.768024049390718
+
+#### Assignment 5
 Coming Soon!
+
